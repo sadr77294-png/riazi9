@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تست ریاضی نهم</title>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Vazirmatn', sans-serif; }
+  html { scroll-behavior: smooth; }
+  body { background: #050505; color: #fff; overflow-x: hidden; min-height: 100vh; line-height: 1.9; }
+  
+  .bg-glow { position: fixed; top: -50%; left: -50%; width: 200%; height: 200%;
+    background: radial-gradient(circle at 20% 30%, rgba(212,175,55,0.08) 0%, transparent 45%),
+                radial-gradient(circle at 80% 70%, rgba(212,175,55,0.05) 0%, transparent 45%);
+    z-index: 0; pointer-events: none; animation: rotateGlow 40s linear infinite; }
+  @keyframes rotateGlow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  
+  .particles { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+  .particle { position: absolute; width: 2px; height: 2px; background: #d4af37; border-radius: 50%;
+    box-shadow: 0 0 8px #d4af37; animation: floatParticle linear infinite; }
+  @keyframes floatParticle {
+    0% { transform: translateY(100vh) scale(0); opacity: 0; }
+    10% { opacity: 1; } 90% { opacity: 1; }
+    100% { transform: translateY(-100px) scale(1); opacity: 0; } }
+  
+  .container { max-width: 1000px; margin: 0 auto; padding: 0 25px; position: relative; z-index: 2; }
+  
+  .navbar { position: fixed; top: 0; left: 0; right: 0; padding: 18px 25px;
+    background: rgba(5,5,5,0.7); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+    border-bottom: 1px solid rgba(212,175,55,0.1); z-index: 100; }
+  .nav-content { max-width: 1000px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+  .logo { font-size: 1.5rem; font-weight: 900;
+    background: linear-gradient(135deg, #d4af37, #f4d03f); -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent; background-clip: text; letter-spacing: 1px; }
+  .nav-links { display: flex; gap: 25px; list-style: none; }
+  .nav-links a { color: #999; text-decoration: none; font-size: 0.9rem; transition: color 0.3s; }
+  .nav-links a:hover { color: #d4af37; }
+  
+  .screen { display: none; padding: 120px 0 60px; min-height: 100vh; position: relative; z-index: 2; }
+  .screen.active { display: block; animation: fadeIn 0.5s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  
+  .hero-title { font-size: 3.5rem; font-weight: 900;
+    background: linear-gradient(135deg, #ffffff 0%, #d4af37 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    margin-bottom: 15px; letter-spacing: -1px; text-align: center; }
+  .hero-sub { text-align: center; color: #888; font-size: 1.1rem; margin-bottom: 50px; }
+  
+  .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 50px; }
+  .stat-card { text-align: center; padding: 30px 20px; background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(212,175,55,0.15); border-radius: 20px; backdrop-filter: blur(20px); }
+  .stat-num { font-size: 2.2rem; font-weight: 900;
+    background: linear-gradient(135deg, #d4af37, #f4d03f);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; display: block; }
+  .stat-lbl { color: #888; font-size: 0.85rem; margin-top: 5px; }
+  
+  .section-label { display: inline-block; color: #d4af37; font-size: 0.8rem;
+    font-weight: 700; letter-spacing: 4px; margin-bottom: 15px; }
+  .section-title { font-size: 1.8rem; font-weight: 900; color: #fff; margin-bottom: 30px; }
+  
+  .chapters-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 18px; margin-bottom: 40px; }
+  .chapter-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(212,175,55,0.12);
+    border-radius: 20px; padding: 25px; cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden;
+    backdrop-filter: blur(20px); }
+  .chapter-card::before { content: ''; position: absolute; top: 0; right: 0; width: 100%; height: 2px;
+    background: linear-gradient(90deg, transparent, #d4af37, transparent);
+    transform: translateX(-100%); transition: transform 0.6s ease; }
+  .chapter-card:hover::before { transform: translateX(100%); }
+  .chapter-card:hover { border-color: rgba(212,175,55,0.4); transform: translateY(-5px);
+    background: rgba(255,255,255,0.04); box-shadow: 0 20px 50px rgba(212,175,55,0.1); }
+  .chapter-num { font-size: 0.85rem; color: #d4af37; font-weight: 700;
+    letter-spacing: 2px; margin-bottom: 10px; }
+  .chapter-name { font-size: 1.2rem; font-weight: 700; color: #fff; margin-bottom: 12px; }
+  .chapter-info { display: flex; justify-content: space-between; font-size: 0.85rem; color: #777; }
+  .chapter-info .q-count { color: #d4af37; font-weight: 600; }
+  
+  .btn { display: inline-flex; align-items: center; gap: 10px; padding: 16px 35px;
+    border-radius: 50px; font-size: 1rem; font-weight: 700; cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); border: none;
+    font-family: 'Vazirmatn', sans-serif; text-decoration: none;
+    position: relative; overflow: hidden; }
+  .btn-primary { background: linear-gradient(135deg, #d4af37, #f4d03f); color: #000;
+    box-shadow: 0 10px 30px rgba(212,175,55,0.25); }
+  .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 20px 50px rgba(212,175,55,0.4); }
+  .btn-secondary { background: rgba(255,255,255,0.03); color: #fff;
+    border: 1px solid rgba(212,175,55,0.25); }
+  .btn-secondary:hover { background: rgba(212,175,55,0.1); border-color: #d4af37;
+    color: #d4af37; transform: translateY(-3px); }
+  .btn-all { width: 100%; justify-content: center; margin-top: 20px; }
+  
+  .quiz-header { display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 40px; flex-wrap: wrap; gap: 20px; }
+  .quiz-info { display: flex; gap: 30px; align-items: center; }
+  .quiz-info-item { display: flex; flex-direction: column; }
+  .quiz-info-label { color: #777; font-size: 0.8rem; }
+  .quiz-info-value { color: #d4af37; font-size: 1.2rem; font-weight: 900; }
+  .timer-box { display: flex; align-items: center; gap: 10px; padding: 12px 25px;
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(212,175,55,0.2);
+    border-radius: 50px; font-weight: 900; font-size: 1.2rem; color: #d4af37;
+    backdrop-filter: blur(10px); }
+  .timer-box.warning { color: #ff4444; border-color: rgba(255,68,68,0.4); }
+  
+  .progress-wrap { height: 6px; background: rgba(255,255,255,0.05);
+    border-radius: 10px; overflow: hidden; margin-bottom: 40px; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, #d4af37, #f4d03f);
+    border-radius: 10px; width: 0%;
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 0 15px rgba(212,175,55,0.5); }
+  
+  .question-card { background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(212,175,55,0.15); border-radius: 25px;
+    padding: 45px; backdrop-filter: blur(25px); animation: slideUp 0.5s ease; }
+  @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+  
+  .q-num { display: inline-block; padding: 6px 18px; background: rgba(212,175,55,0.1);
+    border: 1px solid rgba(212,175,55,0.3); border-radius: 50px;
+    font-size: 0.85rem; font-weight: 700; color: #d4af37; margin-bottom: 20px; }
+  .q-text { font-size: 1.4rem; font-weight: 700; color: #fff;
+    line-height: 1.7; margin-bottom: 35px; }
+  .options { display: grid; gap: 15px; }
+  .option { display: flex; align-items: center; gap: 15px; padding: 20px 25px;
+    background: rgba(255,255,255,0.03); border: 2px solid rgba(212,175,55,0.1);
+    border-radius: 15px; cursor: pointer; transition: all 0.3s ease;
+    font-size: 1.05rem; font-weight: 600; color: #ddd; text-align: right; }
+  .option:hover:not(.disabled) { background: rgba(212,175,55,0.08);
+    border-color: rgba(212,175,55,0.5); transform: translateX(-5px); }
+  .option-letter { width: 35px; height: 35px; border-radius: 50%;
+    background: rgba(212,175,55,0.1); border: 1px solid rgba(212,175,55,0.3);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 900; color: #d4af37; flex-shrink: 0; }
+  .option.correct { background: rgba(34,197,94,0.15); border-color: #22c55e; color: #4ade80; }
+  .option.correct .option-letter { background: #22c55e; color: #fff; border-color: #22c55e; }
+  .option.wrong { background: rgba(239,68,68,0.15); border-color: #ef4444; color: #f87171; }
+  .option.wrong .option-letter { background: #ef4444; color: #fff; border-color: #ef4444; }
+  .option.disabled { cursor: not-allowed; opacity: 0.7; }
+  
+  .explain-box { margin-top: 25px; padding: 20px 25px;
+    background: rgba(212,175,55,0.06); border-right: 3px solid #d4af37;
+    border-radius: 12px; color: #ccc; display: none; animation: fadeIn 0.4s ease; }
+  .explain-box.show { display: block; }
+  .explain-box strong { color: #d4af37; margin-left: 5px; }
+  
+  .next-wrap { margin-top: 30px; display: flex; justify-content: flex-start; }
+  
+  .result-card { text-align: center; background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(212,175,55,0.15); border-radius: 25px;
+    padding: 60px 40px; backdrop-filter: blur(25px); animation: slideUp 0.6s ease; }
+  .result-emoji { font-size: 5rem; margin-bottom: 20px; display: block;
+    animation: bounceIn 0.8s ease; }
+  @keyframes bounceIn {
+    0% { transform: scale(0); } 60% { transform: scale(1.2); }
+    100% { transform: scale(1); } }
+  .result-title { font-size: 2.5rem; font-weight: 900;
+    background: linear-gradient(135deg, #fff, #d4af37);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text; margin-bottom: 15px; }
+  .result-percent { font-size: 5rem; font-weight: 900;
+    background: linear-gradient(135deg, #d4af37, #f4d03f);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text; display: block; line-height: 1; margin: 20px 0; }
+  .result-stats { display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 20px; margin: 40px 0; }
+  .result-stat { padding: 25px 15px; background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(212,175,55,0.1); border-radius: 15px; }
+  .result-stat-num { font-size: 2rem; font-weight: 900; display: block; margin-bottom: 5px; }
+  .result-stat-num.green { color: #4ade80; }
+  .result-stat-num.red { color: #f87171; }
+  .result-stat-num.gold { color: #d4af37; }
+  .result-stat-lbl { color: #888; font-size: 0.85rem; }
+  .result-buttons { display: flex; gap: 15px; justify-content: center;
+    flex-wrap: wrap; margin-top: 30px; }
+  
+  .review-item { background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(239,68,68,0.2); border-radius: 18px;
+    padding: 25px; margin-bottom: 18px; border-right: 3px solid #ef4444; }
+  .review-q { font-size: 1.1rem; font-weight: 700; color: #fff; margin-bottom: 15px; }
+  .review-answer { display: flex; gap: 10px; align-items: center;
+    font-size: 0.95rem; margin-bottom: 8px; }
+  .review-answer .label { color: #888; min-width: 80px; }
+  .review-answer .correct-val { color: #4ade80; font-weight: 700; }
+  .review-answer .wrong-val { color: #f87171; font-weight: 700; text-decoration: line-through; }
+  .no-mistakes { text-align: center; padding: 60px 30px;
+    color: #4ade80; font-size: 1.3rem; font-weight: 700; }
+  
+  footer { text-align: center; padding: 50px 20px 30px;
+    border-top: 1px solid rgba(212,175,55,0.1); margin-top: 60px;
+    position: relative; z-index: 2; }
+  footer p { color: #555; font-size: 0.9rem; }
+  
+  @media (max-width: 700px) {
+    .nav-links { display: none; }
+    .hero-title { font-size: 2.2rem; }
+    .stats-row { grid-template-columns: 1fr; gap: 12px; }
+    .stat-card { padding: 20px 15px; }
+    .stat-num { font-size: 1.8rem; }
+    .question-card { padding: 30px 22px; }
+    .q-text { font-size: 1.15rem; }
+    .option { padding: 15px 18px; font-size: 0.95rem; }
+    .option-letter { width: 30px; height: 30px; font-size: 0.9rem; }
+    .result-percent { font-size: 3.5rem; }
+    .result-title { font-size: 1.8rem; }
+    .result-stats { grid-template-columns: 1fr; gap: 12px; }
+    .quiz-info { gap: 18px; }
+    .quiz-info-value { font-size: 1rem; }
+    .timer-box { padding: 10px 18px; font-size: 1rem; }
+    .chapters-grid { grid-template-columns: 1fr; }
+    .section-title { font-size: 1.4rem; }
+  }
+</style>
+</head>
+<body>
+  
+  <div class="bg-glow"></div>
+  <div class="particles" id="particles"></div>
+  
+  <nav class="navbar">
+    <div class="nav-content">
+      <div class="logo">ریاضی نهم</div>
+      <ul class="nav-links">
+        <li><a href="#" onclick="goHome()">خانه</a></li>
+      </ul>
+    </div>
+  </nav>
+  
+  <div class="screen active" id="screen-home">
+    <div class="container">
+      <h1 class="hero-title">تست ریاضی نهم</h1>
+      <p class="hero-sub">۸ فصل کتاب — تست‌های استاندارد با پاسخ تشریحی</p>
+      
+      <div class="stats-row">
+        <div class="stat-card">
+          <span class="stat-num">۸</span>
+          <span class="stat-lbl">فصل کتاب</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-num" id="totalQuestions">۰</span>
+          <span class="stat-lbl">سوال موجود</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-num">∞</span>
+          <span class="stat-lbl">تلاش</span>
+        </div>
+      </div>
+      
+      <span class="section-label">CHAPTERS</span>
+      <h2 class="section-title">فصل‌ها</h2>
+      
+      <div class="chapters-grid" id="chaptersGrid"></div>
+      
+      <button class="btn btn-primary btn-all" onclick="startAllQuiz()">
+        🎯 آزمون جامع (همه فصل‌ها)
+      </button>
+    </div>
+  </div>
+  
+  <div class="screen" id="screen-quiz">
+    <div class="container">
+      <div class="quiz-header">
+        <div class="quiz-info">
+          <div class="quiz-info-item">
+            <span class="quiz-info-label">فصل</span>
+            <span class="quiz-info-value" id="quizChapter">—</span>
+          </div>
+          <div class="quiz-info-item">
+            <span class="quiz-info-label">سوال</span>
+            <span class="quiz-info-value" id="quizProgress">۱ از ۱۰</span>
+          </div>
+        </div>
+        <div class="timer-box" id="timerBox">
+          <span>⏱️</span>
+          <span id="timer">۰۰:۰۰</span>
+        </div>
+      </div>
+      
+      <div class="progress-wrap">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+      
+      <div class="question-card" id="questionCard">
+        <span class="q-num" id="qNum">سوال ۱</span>
+        <div class="q-text" id="qText"></div>
+        <div class="options" id="options"></div>
+        <div class="explain-box" id="explainBox"></div>
+        <div class="next-wrap" id="nextWrap" style="display:none;">
+          <button class="btn btn-primary" onclick="nextQuestion()">
+            سوال بعدی ←
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="screen" id="screen-result">
+    <div class="container">
+      <div class="result-card">
+        <span class="result-emoji" id="resultEmoji">🏆</span>
+        <h2 class="result-title" id="resultTitle">نتیجه آزمون</h2>
+        <span class="result-percent" id="resultPercent">۰٪</span>
+        
+        <div class="result-stats">
+          <div class="result-stat">
+            <span class="result-stat-num green" id="correctCount">۰</span>
+            <span class="result-stat-lbl">درست</span>
+          </div>
+          <div class="result-stat">
+            <span class="result-stat-num red" id="wrongCount">۰</span>
+            <span class="result-stat-lbl">غلط</span>
+          </div>
+          <div class="result-stat">
+            <span class="result-stat-num gold" id="timeUsed">۰۰:۰۰</span>
+            <span class="result-stat-lbl">زمان</span>
+          </div>
+        </div>
+        
+        <div class="result-buttons">
+          <button class="btn btn-primary" onclick="retryQuiz()">🔄 دوباره</button>
+          <button class="btn btn-secondary" onclick="showReview()">📋 مرور اشتباهات</button>
+          <button class="btn btn-secondary" onclick="goHome()">🏠 خانه</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="screen" id="screen-review">
+    <div class="container">
+      <span class="section-label">REVIEW</span>
+      <h2 class="section-title">مرور اشتباهات</h2>
+      <div id="reviewList"></div>
+      <div style="margin-top: 30px; text-align: center;">
+        <button class="btn btn-secondary" onclick="goHome()">🏠 بازگشت به خانه</button>
+      </div>
+    </div>
+  </div>
+  
+  <footer>
+    <p>© ۱۴۰۴ - تست ریاضی نهم | ساخته شده با ❤️</p>
+  </footer>
+    <script>
+    // ═══════════════════════════════════════════════════════
+    // 📌 تست‌ها اینجان — برای اضافه کردن، از قالب زیر استفاده کن
+    // ═══════════════════════════════════════════════════════
+    // {
+    //   q: "متن سوال؟",
+    //   options: ["گزینه ۱", "گزینه ۲", "گزینه ۳", "گزینه ۴"],
+    //   answer: 0,  // 0=اولی، 1=دومی، 2=سومی، 3=چهارمی
+    //   explain: "توضیح جواب"
+    // }
+    // ═══════════════════════════════════════════════════════
+    
+    const chapters = [
+      {
+        id: 1,
+        name: 'مجموعه‌ها',
+        questions: [
+          { q: 'مجموعه اعداد طبیعی کوچک‌تر از ۵ کدام است؟', options: ['{۱،۲،۳،۴}', '{۰،۱،۲،۳،۴}', '{۱،۲،۳،۴،۵}', '{۰،۱،۲،۳}'], answer: 0, explain: 'اعداد طبیعی از ۱ شروع می‌شوند، پس کوچک‌تر از ۵ می‌شود ۱ تا ۴.' },
+          { q: 'اگر A={۱،۲،۳} و B={۲،۳،۴}، آنگاه A∩B کدام است؟', options: ['{۱،۲،۳،۴}', '{۲،۳}', '{۱،۴}', '{۱،۲،۳}'], answer: 1, explain: 'اشتراک دو مجموعه، اعضای مشترک آن‌هاست: ۲ و ۳.' },
+          { q: 'تعداد زیرمجموعه‌های یک مجموعه ۳ عضوی چند است؟', options: ['۳', '۶', '۸', '۹'], answer: 2, explain: 'تعداد زیرمجموعه‌ها = ۲ⁿ = ۲³ = ۸.' },
+          { q: 'کدام مجموعه متناهی است؟', options: ['مجموعه اعداد طبیعی', 'مجموعه اعداد صحیح', 'مجموعه روزهای هفته', 'مجموعه اعداد حقیقی'], answer: 2, explain: 'روزهای هفته ۷ عضو دارد و متناهی است.' },
+          { q: 'اگر A={a,b} و B={b,c}، A∪B کدام است؟', options: ['{b}', '{a,b,c}', '{a,c}', '{a,b}'], answer: 1, explain: 'اجتماع دو مجموعه، همه اعضای هر دو مجموعه است.' },
+          { q: 'مجموعه اعداد اول یک‌رقمی کدام است؟', options: ['{۱،۲،۳،۵،۷}', '{۲،۳،۵،۷}', '{۲،۳،۵،۷،۹}', '{۱،۳،۵،۷}'], answer: 1, explain: 'اعداد اول یک‌رقمی: ۲،۳،۵،۷ (۱ اول نیست).' },
+          { q: 'اگر A⊂B و B⊂A، آنگاه چه نتیجه‌ای می‌گیریم؟', options: ['A بزرگ‌تر از B است', 'A=B', 'A و B جدا هستند', 'نمی‌توان گفت'], answer: 1, explain: 'اگر هر دو زیرمجموعه هم باشند، برابرند.' },
+          { q: 'کدام گزینه مجموعه تهی را نشان می‌دهد؟', options: ['{۰}', '{∅}', '{}', '{تهی}'], answer: 2, explain: 'مجموعه تهی با {} یا ∅ نشان داده می‌شود.' },
+        ]
+      },
+      {
+        id: 2,
+        name: 'عددهای حقیقی',
+        questions: [
+          { q: 'کدام عدد گنگ است؟', options: ['۰/۵', '√۴', '√۲', '۷/۳'], answer: 2, explain: '√۲ عددی گنگ است و اعشار آن پایان‌ناپذیر و غیرتکراری است.' },
+          { q: 'حاصل ۳√۲ + ۵√۲ چند است؟', options: ['۸√۲', '۱۵√۲', '۸√۴', '۲√۲'], answer: 0, explain: 'جمع رادیکال‌های مشابه: (۳+۵)√۲ = ۸√۲.' },
+          { q: 'عدد ۰/۳۳۳... (تکراری) کدام نوع عدد است؟', options: ['گنگ', 'طبیعی', 'گویا', 'صحیح منفی'], answer: 2, explain: 'اعشار متناوب، عدد گویاست و به کسر تبدیل می‌شود.' },
+          { q: 'قرینه عدد ۷- کدام است؟', options: ['۷', '۷-', '۱/۷', '۷/۱'], answer: 0, explain: 'قرینه هر عدد، منفی آن است: ۷.' },
+          { q: 'حاصل √۹ × √۴ چند است؟', options: ['۶', '۱۳', '۳۶', '√۱۳'], answer: 0, explain: '√۹=۳ و √۴=۲، حاصل‌ضرب ۳×۲=۶.' },
+          { q: 'کدام عدد بین ۱ و ۲ قرار دارد؟', options: ['√۲', '√۵', '√۱۰', '√۱۶'], answer: 0, explain: '√۲≈۱/۴۱ که بین ۱ و ۲ است.' },
+          { q: 'حاصل ۲³ + ۳² چند است؟', options: ['۱۷', '۱۳', '۳۶', '۲۵'], answer: 0, explain: '۲³=۸ و ۳²=۹، جمع ۸+۹=۱۷.' },
+          { q: 'کدام عدد صحیح است ولی طبیعی نیست؟', options: ['۵', '۰', '۳-', 'هر دو مورد ۰ و ۳-'], answer: 3, explain: 'اعداد صحیح شامل منفی‌ها و صفر است، ولی طبیعی از ۱ شروع می‌شود.' },
+        ]
+      },
+      {
+        id: 3,
+        name: 'استدلال و اثبات در هندسه',
+        questions: [
+          { q: 'مجموع زوایای داخلی یک مثلث چند درجه است؟', options: ['۹۰', '۱۸۰', '۲۷۰', '۳۶۰'], answer: 1, explain: 'مجموع زوایای داخلی هر مثلث ۱۸۰ درجه است.' },
+          { q: 'در مثلث قائم‌الزاویه، ضلع مقابل زاویه ۹۰ درجه چه نام دارد؟', options: ['قاعده', 'ارتفاع', 'وتر', 'میانه'], answer: 2, explain: 'بزرگ‌ترین ضلع مثلث قائم‌الزاویه، وتر نام دارد.' },
+          { q: 'دو مثلث متشابه چه ویژگی‌ای دارند؟', options: ['اضلاع برابر', 'زوایای برابر', 'مساحت برابر', 'محیط برابر'], answer: 1, explain: 'در مثلث‌های متشابه، زوایای متناظر برابرند.' },
+          { q: 'در هر مثلث، مجموع دو ضلع همیشه ... ضلع سوم است.', options: ['برابر', 'بزرگ‌تر از', 'کوچک‌تر از', 'نصف'], answer: 1, explain: 'نامساوی مثلث: مجموع دو ضلع بزرگ‌تر از ضلع سوم است.' },
+          { q: 'قضیه فیثاغورس در کدام مثلث برقرار است؟', options: ['متساوی‌الاضلاع', 'متساوی‌الساقین', 'قائم‌الزاویه', 'منفرجه'], answer: 2, explain: 'قضیه فیثاغورس فقط در مثلث قائم‌الزاویه برقرار است.' },
+          { q: 'اگر دو خط موازی را خط سومی قطع کند، زوایای متقابل به راس ...', options: ['مکمل', 'برابر', 'متمم', 'متناظر'], answer: 1, explain: 'زوایای متقابل به راس همیشه برابرند.' },
+          { q: 'زاویه خارجی مثلث برابر است با ...', options: ['مجموع دو زاویه داخلی مجاور', 'مجموع دو زاویه داخلی غیرمجاور', 'تفاضل دو زاویه داخلی', 'نصف مجموع زوایا'], answer: 1, explain: 'زاویه خارجی = مجموع دو زاویه داخلی غیرمجاور.' },
+        ]
+      },
+      {
+        id: 4,
+        name: 'توان و ریشه',
+        questions: [
+          { q: 'حاصل ۲⁵ چند است؟', options: ['۱۰', '۲۵', '۳۲', '۱۶'], answer: 2, explain: '۲×۲×۲×۲×۲ = ۳۲.' },
+          { q: 'حاصل ۳⁰ چند است؟', options: ['۰', '۱', '۳', 'تعریف نشده'], answer: 1, explain: 'هر عدد غیرصفر به توان صفر برابر ۱ است.' },
+          { q: 'حاصل ۲⁻³ چند است؟', options: ['۸-', '۸', '۱/۸', '۱/۸-'], answer: 2, explain: 'توان منفی: ۱ تقسیم بر ۲³ = ۱/۸.' },
+          { q: 'حاصل ۵² × ۵³ چند است؟', options: ['۵⁵', '۵⁶', '۲۵⁵', '۵¹'], answer: 0, explain: 'در ضرب توان‌های هم‌پایه، توان‌ها جمع می‌شوند: ۵⁵.' },
+          { q: 'حاصل √۲۵ + √۱۶ چند است؟', options: ['۹', '۴۱', '√۴۱', '۲۰'], answer: 0, explain: '√۲۵=۵ و √۱۶=۴، جمع = ۹.' },
+          { q: 'حاصل (۲³)² چند است؟', options: ['۲⁵', '۲⁶', '۲⁹', '۶۴'], answer: 1, explain: 'توان توان: (۲³)² = ۲⁶ = ۶۴.' },
+          { q: 'کدام عدد بین ۳ و ۴ قرار دارد؟', options: ['√۸', '√۱۰', '√۱۵', '√۲۰'], answer: 1, explain: '√۱۰≈۳/۱۶ که بین ۳ و ۴ است.' },
+          { q: 'حاصل ۱۰⁴ چند است؟', options: ['۱۰۰۰', '۱۰۰۰۰', '۱۰۰۰۰۰', '۴۰'], answer: 1, explain: '۱۰⁴ = ۱۰×۱۰×۱۰×۱۰ = ۱۰۰۰۰.' },
+        ]
+      },
+      {
+        id: 5,
+        name: 'عبارت‌های جبری',
+        questions: [
+          { q: 'حاصل (x+۲)(x+۳) چند است؟', options: ['x²+۵x+۶', 'x²+۶x+۵', 'x²+۵x+۵', 'x²+۶'], answer: 0, explain: 'ضرب دوجمله‌ای‌ها: x²+۳x+۲x+۶ = x²+۵x+۶.' },
+          { q: 'اتحاد (a+b)² برابر است با:', options: ['a²+b²', 'a²+۲ab+b²', 'a²-۲ab+b²', 'a²+b²+ab'], answer: 1, explain: 'اتحاد مربع دو جمله‌ای: a²+۲ab+b².' },
+          { q: 'تجزیه x²-۹ برابر است با:', options: ['(x-۳)(x+۳)', '(x-۹)(x+۱)', '(x-۳)²', '(x+۹)(x-۱)'], answer: 0, explain: 'تفاضل مربعین: a²-b²=(a-b)(a+b).' },
+          { q: 'اگر x=۲ باشد، مقدار ۳x²+۱ چند است؟', options: ['۱۳', '۷', '۱۲', '۶'], answer: 0, explain: '۳(۲)²+۱ = ۳×۴+۱ = ۱۳.' },
+          { q: 'حاصل (a-b)² برابر است با:', options: ['a²-b²', 'a²+۲ab-b²', 'a²-۲ab+b²', 'a²+b²'], answer: 2, explain: 'اتحاد مربع تفاضل: a²-۲ab+b².' },
+          { q: 'ساده شده ۲x+۳x-۵x چند است؟', options: ['۰', '۱۰x', 'x', '۵x'], answer: 0, explain: '۲+۳-۵=۰، پس حاصل صفر است.' },
+          { q: 'تجزیه x²+۵x+۶ برابر است با:', options: ['(x+۲)(x+۳)', '(x+۱)(x+۶)', '(x-۲)(x-۳)', '(x+۵)(x+۱)'], answer: 0, explain: 'دو عدد که جمعشان ۵ و ضربشان ۶ باشد: ۲ و ۳.' },
+          { q: 'حاصل (x+۱)² - (x-۱)² چند است؟', options: ['۴x', '۲x', '۴', '۰'], answer: 0, explain: 'با اتحاد: (x²+۲x+۱)-(x²-۲x+۱) = ۴x.' },
+        ]
+      },
+      {
+        id: 6,
+        name: 'خط و معادله‌های خطی',
+        questions: [
+          { q: 'شیب خط y=۲x+۳ چند است؟', options: ['۳', '۲', '۵', '۱'], answer: 1, explain: 'در معادله y=mx+b، m شیب است: ۲.' },
+          { q: 'عرض از مبدأ خط y=-x+۴ چند است؟', options: ['۴', '۱-', '۴-', '۱'], answer: 0, explain: 'در y=mx+b، b عرض از مبدأ است: ۴.' },
+          { q: 'حاصل حل معادله ۲x+۶=۰ چند است؟', options: ['۳', '۳-', '۶', '۶-'], answer: 1, explain: '۲x=-۶ پس x=-۳.' },
+          { q: 'دو خط موازی چه شیبی دارند؟', options: ['برابر', 'منفی یکدیگر', 'معکوس', 'صفر'], answer: 0, explain: 'خطوط موازی شیب برابر دارند.' },
+          { q: 'دو خط عمود بر هم چه رابطه‌ای بین شیب دارند؟', options: ['برابر', 'حاصل‌ضربشان ۱-', 'جمعشان صفر', 'تفاضلشان صفر'], answer: 1, explain: 'حاصل‌ضرب شیب دو خط عمود بر هم برابر ۱- است.' },
+          { q: 'نقطه (۰،۳) روی کدام خط قرار دارد؟', options: ['y=۲x', 'y=x+۳', 'y=۳x', 'y=x'], answer: 1, explain: 'با جایگذاری x=۰: y=۳ درست است.' },
+          { q: 'حل دستگاه x+y=۵ و x-y=۱، مقدار x چند است؟', options: ['۳', '۲', '۴', '۱'], answer: 0, explain: 'جمع دو معادله: ۲x=۶ پس x=۳.' },
+          { q: 'معادله خطی که از مبدأ می‌گذرد، چه ویژگی دارد؟', options: ['شیب صفر', 'عرض از مبدأ صفر', 'شیب بی‌نهایت', 'موازی محور x'], answer: 1, explain: 'خط گذرنده از مبدأ، عرض از مبدأ صفر دارد: y=mx.' },
+        ]
+      },
+      {
+        id: 7,
+        name: 'عبارت‌های گنگ',
+        questions: [
+          { q: 'حاصل √۱۲ ساده شده چند است؟', options: ['۲√۳', '۳√۲', '۲√۶', '۶√۲'], answer: 0, explain: '√۱۲ = √(۴×۳) = ۲√۳.' },
+          { q: 'حاصل √۲ × √۸ چند است؟', options: ['۴', '۱۶', '۲√۸', '√۱۰'], answer: 0, explain: '√۲ × √۸ = √۱۶ = ۴.' },
+          { q: 'مخرج کسر ۱/√۲ را گویا کن:', options: ['√۲/۲', '۲/√۲', '۱/۲', '√۲'], answer: 0, explain: 'ضرب صورت و مخرج در √۲: √۲/۲.' },
+          { q: 'حاصل √۵۰ - √۱۸ چند است؟', options: ['۲√۲', '۴√۲', '۸√۲', '۲√۸'], answer: 0, explain: '√۵۰=۵√۲ و √۱۸=۳√۲، تفاضل = ۲√۲.' },
+          { q: 'کدام عبارت گنگ است؟', options: ['√۹', '√۱۶', '√۷', '√۲۵'], answer: 2, explain: '√۷ گنگ است (مربع کامل نیست).' },
+          { q: 'حاصل (√۳)² چند است؟', options: ['۳', '۹', '√۳', '۶'], answer: 0, explain: 'مجذور رادیکال، خود عدد زیر رادیکال است.' },
+          { q: 'حاصل √۲ × √۳ چند است؟', options: ['√۵', '√۶', '۶', '۵'], answer: 1, explain: '√۲ × √۳ = √۶.' },
+        ]
+      },
+      {
+        id: 8,
+        name: 'حجم و مساحت',
+        questions: [
+          { q: 'حجم مکعبی به ضلع ۳ سانتی‌متر چند است؟', options: ['۹', '۱۸', '۲۷', '۳۶'], answer: 2, explain: 'حجم مکعب = ضلع³ = ۳³ = ۲۷.' },
+          { q: 'مساحت کل مکعب به ضلع ۲ چند است؟', options: ['۸', '۱۲', '۲۴', '۱۶'], answer: 2, explain: 'مساحت کل مکعب = ۶a² = ۶×۴ = ۲۴.' },
+          { q: 'حجم استوانه با شعاع ۲ و ارتفاع ۵ (با π=۳) چند است؟', options: ['۳۰', '۶۰', '۲۰', '۴۰'], answer: 1, explain: 'V = πr²h = ۳×۴×۵ = ۶۰.' },
+          { q: 'مساحت دایره با شعاع ۳ (با π=۳) چند است؟', options: ['۹', '۱۸', '۲۷', '۳۶'], answer: 2, explain: 'S = πr² = ۳×۹ = ۲۷.' },
+          { q: 'حجم هرم با مساحت قاعده ۱۲ و ارتفاع ۵ چند است؟', options: ['۶۰', '۲۰', '۳۰', '۱۵'], answer: 1, explain: 'V = ⅓ × مساحت قاعده × ارتفاع = ⅓×۱۲×۵ = ۲۰.' },
+          { q: 'محیط دایره با شعاع ۵ (با π=۳) چند است؟', options: ['۱۵', '۳۰', '۲۵', '۱۰'], answer: 1, explain: 'محیط = ۲πr = ۲×۳×۵ = ۳۰.' },
+          { q: 'حجم مخروط با شعاع ۳ و ارتفاع ۴ (با π=۳) چند است؟', options: ['۳۶', '۱۰۸', '۱۲', '۲۴'], answer: 0, explain: 'V = ⅓πr²h = ⅓×۳×۹×۴ = ۳۶.' },
+        ]
+      }
+    ];
+  </script>
+  <script>
+    // ═══════════════════════════════════════════════
+    // 🧠 منطق سایت — نیازی به تغییر این بخش نیست
+    // ═══════════════════════════════════════════════
+    
+    let currentQuiz = {
+      questions: [],
+      currentIndex: 0,
+      correct: 0,
+      wrong: 0,
+      wrongList: [],
+      startTime: null,
+      timerInterval: null,
+      chapterName: ''
+    };
+    
+    // ===== تبدیل عدد به فارسی =====
+    function toFa(num) {
+      return num.toString().replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+    }
+    
+    // ===== نمایش صفحه =====
+    function showScreen(id) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    
+    // ===== ساخت کارت فصل‌ها =====
+    function renderChapters() {
+      const grid = document.getElementById('chaptersGrid');
+      grid.innerHTML = '';
+      let total = 0;
+      
+      chapters.forEach(ch => {
+        total += ch.questions.length;
+        const card = document.createElement('div');
+        card.className = 'chapter-card';
+        card.onclick = () => startQuiz(ch.id);
+        card.innerHTML = `
+          <div class="chapter-num">فصل ${toFa(ch.id)}</div>
+          <div class="chapter-name">${ch.name}</div>
+          <div class="chapter-info">
+            <span>${toFa(ch.questions.length)} سوال</span>
+            <span class="q-count">شروع ←</span>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+      
+      document.getElementById('totalQuestions').textContent = toFa(total);
+    }
+    
+    // ===== شروع آزمون یک فصل =====
+    function startQuiz(chapterId) {
+      const ch = chapters.find(c => c.id === chapterId);
+      if (!ch) return;
+      
+      currentQuiz.questions = [...ch.questions];
+      currentQuiz.chapterName = `فصل ${toFa(ch.id)} - ${ch.name}`;
+      resetQuizState();
+      showScreen('screen-quiz');
+      renderQuestion();
+      startTimer();
+    }
+    
+    // ===== شروع آزمون جامع =====
+    function startAllQuiz() {
+      let all = [];
+      chapters.forEach(ch => {
+        ch.questions.forEach(q => all.push(q));
+      });
+      // شافل
+      all = all.sort(() => Math.random() - 0.5).slice(0, 20);
+      
+      currentQuiz.questions = all;
+      currentQuiz.chapterName = 'آزمون جامع';
+      resetQuizState();
+      showScreen('screen-quiz');
+      renderQuestion();
+      startTimer();
+    }
+    
+    // ===== ریست =====
+    function resetQuizState() {
+      currentQuiz.currentIndex = 0;
+      currentQuiz.correct = 0;
+      currentQuiz.wrong = 0;
+      currentQuiz.wrongList = [];
+      currentQuiz.startTime = Date.now();
+      if (currentQuiz.timerInterval) clearInterval(currentQuiz.timerInterval);
+    }
+    
+    // ===== تایمر =====
+    function startTimer() {
+      const timerEl = document.getElementById('timer');
+      const box = document.getElementById('timerBox');
+      box.classList.remove('warning');
+      
+      currentQuiz.timerInterval = setInterval(() => {
+        const elapsed = Math.floor((Date.now() - currentQuiz.startTime) / 1000);
+        const min = Math.floor(elapsed / 60);
+        const sec = elapsed % 60;
+        timerEl.textContent = `${toFa(String(min).padStart(2,'0'))}:${toFa(String(sec).padStart(2,'0'))}`;
+        
+        if (elapsed >= 300) box.classList.add('warning');
+      }, 1000);
+    }
+    
+    // ===== نمایش سوال =====
+    function renderQuestion() {
+      const q = currentQuiz.questions[currentQuiz.currentIndex];
+      const total = currentQuiz.questions.length;
+      const idx = currentQuiz.currentIndex;
+      
+      document.getElementById('quizChapter').textContent = currentQuiz.chapterName;
+      document.getElementById('quizProgress').textContent = `${toFa(idx+1)} از ${toFa(total)}`;
+      document.getElementById('qNum').textContent = `سوال ${toFa(idx+1)}`;
+      document.getElementById('qText').textContent = q.q;
+      
+      const progress = ((idx) / total) * 100;
+      document.getElementById('progressFill').style.width = progress + '%';
+      
+      const optionsEl = document.getElementById('options');
+      optionsEl.innerHTML = '';
+      
+      const letters = ['الف', 'ب', 'ج', 'د'];
+      
+      q.options.forEach((opt, i) => {
+        const div = document.createElement('div');
+        div.className = 'option';
+        div.innerHTML = `<span class="option-letter">${letters[i]}</span><span>${opt}</span>`;
+        div.onclick = () => selectAnswer(i, div);
+        optionsEl.appendChild(div);
+      });
+      
+      document.getElementById('explainBox').classList.remove('show');
+      document.getElementById('nextWrap').style.display = 'none';
+    }
+    
+    // ===== انتخاب جواب =====
+    function selectAnswer(selected, el) {
+      const q = currentQuiz.questions[currentQuiz.currentIndex];
+      const options = document.querySelectorAll('.option');
+      
+      options.forEach(o => o.classList.add('disabled'));
+      
+      options.forEach((o, i) => {
+        if (i === q.answer) o.classList.add('correct');
+        if (i === selected && i !== q.answer) o.classList.add('wrong');
+      });
+      
+      if (selected === q.answer) {
+        currentQuiz.correct++;
+      } else {
+        currentQuiz.wrong++;
+        currentQuiz.wrongList.push({
+          q: q.q,
+          correct: q.options[q.answer],
+          wrong: q.options[selected],
+          explain: q.explain
+        });
+      }
+      
+      const expBox = document.getElementById('explainBox');
+      expBox.innerHTML = `<strong>توضیح:</strong> ${q.explain}`;
+      expBox.classList.add('show');
+      
+      document.getElementById('nextWrap').style.display = 'flex';
+    }
+    
+    // ===== سوال بعدی =====
+    function nextQuestion() {
+      currentQuiz.currentIndex++;
+      if (currentQuiz.currentIndex >= currentQuiz.questions.length) {
+        finishQuiz();
+      } else {
+        renderQuestion();
+      }
+    }
+    
+    // ===== پایان آزمون =====
+    function finishQuiz() {
+      clearInterval(currentQuiz.timerInterval);
+      const total = currentQuiz.questions.length;
+      const percent = Math.round((currentQuiz.correct / total) * 100);
+      const elapsed = Math.floor((Date.now() - currentQuiz.startTime) / 1000);
+      const min = Math.floor(elapsed / 60);
+      const sec = elapsed % 60;
+      
+      document.getElementById('resultPercent').textContent = toFa(percent) + '٪';
+      document.getElementById('correctCount').textContent = toFa(currentQuiz.correct);
+      document.getElementById('wrongCount').textContent = toFa(currentQuiz.wrong);
+      document.getElementById('timeUsed').textContent = `${toFa(String(min).padStart(2,'0'))}:${toFa(String(sec).padStart(2,'0'))}`;
+      
+      let emoji = '😐', title = 'باز هم تلاش کن!';
+      if (percent >= 90) { emoji = '🏆'; title = 'فوق‌العاده بود!'; }
+      else if (percent >= 75) { emoji = '🎉'; title = 'عالی بود!'; }
+      else if (percent >= 50) { emoji = '👍'; title = 'خوب بود!'; }
+      else if (percent >= 30) { emoji = '💪'; title = 'باز هم تلاش کن!'; }
+      else { emoji = '📚'; title = 'نیاز به مطالعه بیشتر'; }
+      
+      document.getElementById('resultEmoji').textContent = emoji;
+      document.getElementById('resultTitle').textContent = title;
+      
+      showScreen('screen-result');
+    }
+    
+    // ===== مرور اشتباهات =====
+    function showReview() {
+      const list = document.getElementById('reviewList');
+      list.innerHTML = '';
+      
+      if (currentQuiz.wrongList.length === 0) {
+        list.innerHTML = '<div class="no-mistakes">🎉 هیچ اشتباهی نداشتی! عالی بودی!</div>';
+      } else {
+        currentQuiz.wrongList.forEach(item => {
+          const div = document.createElement('div');
+          div.className = 'review-item';
+          div.innerHTML = `
+            <div class="review-q">${item.q}</div>
+            <div class="review-answer">
+              <span class="label">جواب تو:</span>
+              <span class="wrong-val">${item.wrong}</span>
+            </div>
+            <div class="review-answer">
+              <span class="label">جواب درست:</span>
+              <span class="correct-val">${item.correct}</span>
+            </div>
+            <div class="review-answer" style="margin-top:10px;">
+              <span class="label">توضیح:</span>
+              <span style="color:#ccc;">${item.explain}</span>
+            </div>
+          `;
+          list.appendChild(div);
+        });
+      }
+      
+      showScreen('screen-review');
+    }
+    
+    // ===== دوباره =====
+    function retryQuiz() {
+      resetQuizState();
+      // شافل سوالات
+      currentQuiz.questions = currentQuiz.questions.sort(() => Math.random() - 0.5);
+      showScreen('screen-quiz');
+      renderQuestion();
+      startTimer();
+    }
+    
+    // ===== خانه =====
+    function goHome() {
+      if (currentQuiz.timerInterval) clearInterval(currentQuiz.timerInterval);
+      showScreen('screen-home');
+    }
+    
+    // ===== ذرات =====
+    function createParticles() {
+      const container = document.getElementById('particles');
+      for (let i = 0; i < 35; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        p.style.left = Math.random() * 100 + '%';
+        p.style.animationDuration = (10 + Math.random() * 15) + 's';
+        p.style.animationDelay = Math.random() * 12 + 's';
+        p.style.width = (1 + Math.random() * 2) + 'px';
+        p.style.height = p.style.width;
+        container.appendChild(p);
+      }
+    }
+    
+    // ===== شروع =====
+    createParticles();
+    renderChapters();
+  </script>
+</body>
+</html>
